@@ -1,11 +1,12 @@
 package com.example.bill.parser;
 
 import com.example.bill.exception.UnsupportedFileTypeException;
+import com.example.bill.exception.WechatParser;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FileParserFactory {
-    public AbstractFileParser getParser(String fileType) {
+    public Object getParser(String fileType) {
         switch(fileType.toLowerCase()) {
             case "alipay":
                 return new AlipayParser();
