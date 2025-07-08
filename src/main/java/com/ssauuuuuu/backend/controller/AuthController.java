@@ -1,21 +1,31 @@
 package com.ssauuuuuu.backend.controller;
 
-//@RestController
-//@RequestMapping("/api/auth")
+
+import com.ssauuuuuu.backend.security.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/auth")
 public class AuthController {
-//    @Autowired
-//    private AuthenticationManager authenticationManager;
-//
-//    @Autowired
-//    private JwtUtils jwtUtils;
-//
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-//        // 认证逻辑实现
-//        String token = jwtUtils.generateToken(request.getUsername());
-//        System.out.println("登录页面");
-//        return ResponseEntity.ok(new JwtResponse(token));
-//    }
+
+    private AuthenticationManager authenticationManager;
+
+
+    private JwtUtils jwtUtils;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        // 认证逻辑实现
+        String token = jwtUtils.generateToken(request.getUsername());
+        System.out.println("登录页面");
+        return ResponseEntity.ok(new JwtResponse(token));
+    }
 
     // 内部DTO类
     private static class LoginRequest {
@@ -39,9 +49,9 @@ public class AuthController {
         }
     }
 
-//    private static class JwtResponse {
-//        private final String token;
-//        JwtResponse(String token) { this.token = token; }
-//        public String getToken() { return token; }
-//    }
+    private static class JwtResponse {
+        private final String token;
+        JwtResponse(String token) { this.token = token; }
+        public String getToken() { return token; }
+    }
 }
