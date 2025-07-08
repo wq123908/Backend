@@ -20,6 +20,9 @@ spring:
     host: localhost
     port: 6379
 
+file:
+  upload-dir: ./uploads
+
 security:
   jwt:
     secret: your-secret-key
