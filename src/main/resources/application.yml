@@ -2,6 +2,17 @@
 spring:
   profiles:
     active: dev
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  apifox:
+    enabled: true
+    server-url: https://api.apifox.com
+    project-id: ${APIFOX_PROJECT_ID}
 ---
 spring:
   config:

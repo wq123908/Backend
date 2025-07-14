@@ -8,7 +8,7 @@ import java.io.IOException;
  * @Date 2025/7/7 18:03
  */
 public class FileParseException extends RuntimeException {
-    public FileParseException(String message, IOException e) {
+    public FileParseException(String message, Exception e) {
         super(message);
     }
 

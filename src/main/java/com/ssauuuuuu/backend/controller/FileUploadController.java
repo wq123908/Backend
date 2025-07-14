@@ -53,14 +53,14 @@ public class FileUploadController {
         // 生成唯一文件名
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = uploadPath.resolve(filename);
-
+        System.out.println("生成文件名："+filename);
         // 保存文件
         file.transferTo(filePath);
 
         try {
             List<AlipayBillDTO> result = FileParserFactory.getParser("alipay")
                 .parseContent(Files.newInputStream(filePath));
-            
+
             return ResponseEntity.ok(Map.of(
                 "savedPath", filePath.toString(),
                 "records", result
