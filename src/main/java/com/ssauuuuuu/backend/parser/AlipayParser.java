@@ -19,7 +19,7 @@ public class AlipayParser extends AbstractFileParser {
 
     private static final String[] ALIPAY_HEADER = {
         "交易时间", "交易分类", "交易对方", "对方账号", "商品说明",
-        "收/支", "金额", "收/付款方", "交易状态", "交易订单号",
+        "收/支", "金额", "收/付款方式", "交易状态", "交易订单号",
         "商家订单号", "备注"
     };
 
@@ -33,7 +33,11 @@ public class AlipayParser extends AbstractFileParser {
      */
     @Override
     public List<AlipayBillDTO> parseContent(InputStream is) throws FileParseException {
-        try (InputStreamReader reader = new InputStreamReader(is, Charset.forName("GBK"))) {
+
+//        try (InputStreamReader reader = new InputStreamReader(is, Charset.forName("GBK"))) {
+        // 可以先尝试用 UTF-8 读取
+        try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+
             BufferedReader bufferedReader = new BufferedReader(reader);
 
             // 跳过前 24 行
@@ -48,8 +52,10 @@ public class AlipayParser extends AbstractFileParser {
             if (headerLine == null) {
                 throw new FileParseException("文件格式错误：无法找到 header 行");
             }
-            System.out.println("支付宝账单文件头"+headerLine);
+            System.out.println("支付宝账单文件头::"+headerLine);
             String[] actualHeaders = headerLine.split(",");
+            System.out.println("actualHeaders::"+ Arrays.toString(actualHeaders));
+            System.out.println("ALIPAY_HEADER::"+ Arrays.toString(ALIPAY_HEADER));
             if (!Arrays.equals(actualHeaders, ALIPAY_HEADER)) {
                 log.warn("支付宝账单文件头不完全匹配，预期: {}, 实际: {}",
                          Arrays.toString(ALIPAY_HEADER), Arrays.toString(actualHeaders));
@@ -61,7 +67,6 @@ public class AlipayParser extends AbstractFileParser {
             return new CsvToBeanBuilder<AlipayBillDTO>(bufferedReader)
                 .withType(AlipayBillDTO.class)
                 .withIgnoreLeadingWhiteSpace(true)
-                .withSkipLines(0) // 因为 header 已经被读取过了
                 .build()
                 .parse();
 

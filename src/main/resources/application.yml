@@ -19,10 +19,10 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.136.128:3306/blender?useSSL=false&serverTimezone=UTC
+    username: blender
+    password: blender
   jpa:
     hibernate:
       ddl-auto: update

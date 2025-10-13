@@ -23,6 +23,10 @@ public class SecurityConfig{
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/files/alipay", "/api/files/alipay/**").permitAll()
+                .requestMatchers("/api/test/hello", "/api/test/hello/**").permitAll()
+                .requestMatchers("/api/bills/month", "/api/bills/month/**").permitAll()
+                .requestMatchers("/api/bills/week-summary", "/api/bills/week-summary/**").permitAll()
+                .requestMatchers("/api/bills/year-summary", "/api/bills/year-summary/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
