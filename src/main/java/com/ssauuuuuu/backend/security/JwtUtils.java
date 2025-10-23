@@ -15,6 +15,9 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import javax.crypto.SecretKey;
+import io.jsonwebtoken.security.Keys;
+
 @Component
 public class JwtUtils {
     private static final Logger logger = Logger.getLogger(JwtUtils.class.getName());
@@ -33,13 +36,17 @@ public class JwtUtils {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
+    // 替换原有的 generateToken 方法
     public String generateToken(String username) {
+        // 使用 Keys.secretKeyFor 生成符合 HS512 要求的安全密钥
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+
         return Jwts.builder()
-            .setSubject(username)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + expirationMs * 1000)) // 转换为毫秒
-            .signWith(SignatureAlgorithm.HS512, secretKey)
-            .compact();
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs * 1000))
+                .signWith(key) // 使用生成的安全密钥
+                .compact();
     }
 
     public boolean validateToken(String token) {
