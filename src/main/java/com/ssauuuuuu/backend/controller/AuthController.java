@@ -1,6 +1,12 @@
 package com.ssauuuuuu.backend.controller;
 
+import com.ssauuuuuu.backend.common.Response;
+import com.ssauuuuuu.backend.common.ResponseUtil;
 import com.ssauuuuuu.backend.security.JwtUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +31,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    @Operation(summary = "用户登录",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "登录成功",
+                content = @Content(schema = @Schema(implementation = Response.class))),
+            @ApiResponse(responseCode = "401", description = "用户名或密码错误",
+                content = @Content(schema = @Schema(implementation = Response.class)))
+        })
+    public ResponseEntity<Response<JwtResponse>> login(@RequestBody LoginRequest request) {
         try {
             // 使用AuthenticationManager进行认证
             Authentication authentication = authenticationManager.authenticate(
@@ -42,23 +55,29 @@ public class AuthController {
             String token = jwtUtils.generateToken(request.getUsername());
 
             // 返回成功响应
-            return ResponseEntity.ok(new JwtResponse(token));
+            return ResponseUtil.success("登录成功", new JwtResponse(token));
         } catch (AuthenticationException e) {
             // 认证失败，返回错误信息
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("用户名或密码错误"));
+            return ResponseUtil.unauthorized("用户名或密码错误");
         }
     }
 
     @GetMapping("/info")
-    public ResponseEntity<?> getUserInfo(Authentication authentication) {
+    @Operation(summary = "获取用户信息",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "获取成功",
+                content = @Content(schema = @Schema(implementation = Response.class))),
+            @ApiResponse(responseCode = "401", description = "未授权",
+                content = @Content(schema = @Schema(implementation = Response.class)))
+        })
+    public ResponseEntity<Response<UserInfoResponse>> getUserInfo(Authentication authentication) {
         if (authentication != null) {
-            return ResponseEntity.ok(new UserInfoResponse(
+            return ResponseUtil.success("获取成功", new UserInfoResponse(
                 authentication.getName(),
                 authentication.getAuthorities().toString()
             ));
         }
-        return ResponseEntity.status(401).body(new ErrorResponse("未授权"));
+        return ResponseUtil.unauthorized("未授权");
     }
 
     // 内部DTO类

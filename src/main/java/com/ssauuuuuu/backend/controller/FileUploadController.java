@@ -1,5 +1,7 @@
 package com.ssauuuuuu.backend.controller;
 
+import com.ssauuuuuu.backend.common.Response;
+import com.ssauuuuuu.backend.common.ResponseUtil;
 import com.ssauuuuuu.backend.dto.AlipayBillDTO;
 import com.ssauuuuuu.backend.exception.FileParseException;
 import com.ssauuuuuu.backend.service.FileUploadService;
@@ -30,17 +32,17 @@ public class FileUploadController {
     @Operation(summary = "支付宝账单转换",
         responses = {
             @ApiResponse(responseCode = "200", description = "转换成功",
-                content = @Content(schema = @Schema(implementation = AlipayBillDTO[].class))),
+                content = @Content(schema = @Schema(implementation = Response.class))),
             @ApiResponse(responseCode = "400", description = "文件格式错误")
         })
-    public ResponseEntity<?> convertAlipayCSV(@RequestPart("file") MultipartFile file) {
+    public ResponseEntity<Response<Map<String, Object>>> convertAlipayCSV(@RequestPart("file") MultipartFile file) {
         try {
             Map<String, Object> result = fileUploadService.convertAlipayCSV(file);
-            return ResponseEntity.ok(result);
+            return ResponseUtil.success("转换成功", result);
         } catch (FileParseException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseUtil.failed(e.getMessage());
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("文件处理失败");
+            return ResponseUtil.failed("文件处理失败");
         }
     }
 }

@@ -40,23 +40,26 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                   FilterChain filterChain)
         throws ServletException, IOException {
         try {
-            // 获取Authorization头
-            String header = request.getHeader("Authorization");
+            // 获取令牌：首先尝试从标准Authorization头获取，然后尝试从自定义token头获取
             String token = null;
             String username = null;
             
-            // 检查Authorization头格式
-            if (header != null && header.startsWith("Bearer ")) {
-                token = header.substring(7);
-                
+            // 检查标准Authorization头格式 (Bearer token)
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer")) {
+                token = authHeader.substring(7);
+            } else {
+                // 如果没有Authorization头，则尝试从自定义token头获取
+                token = request.getHeader("token");
+            }
+            
+            // 如果获取到了token，则尝试解析
+            if (token != null) {
                 try {
-                    // 解析JWT token获取用户名
-                    Claims claims = Jwts.parser()
-                            .setSigningKey(Base64.getEncoder().encodeToString(jwtUtils.getSecretKey().getBytes()))
-                            .parseClaimsJws(token)
-                            .getBody();
-                    
-                    username = claims.getSubject();
+                    // 首先验证token是否有效，然后获取用户名
+                    if (jwtUtils.validateToken(token)) {
+                        username = jwtUtils.getUsernameFromToken(token);
+                    }
                 } catch (Exception e) {
                     // Token无效
                     logger.error("JWT token无效: " + e.getMessage());

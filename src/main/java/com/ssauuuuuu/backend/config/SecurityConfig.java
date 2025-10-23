@@ -39,12 +39,10 @@ public class SecurityConfig{
                 .requestMatchers("/api/**")
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/files/alipay", "/api/files/alipay/**").permitAll()
-                .requestMatchers("/api/test/hello", "/api/test/hello/**").permitAll()
-                .requestMatchers("/api/bills/month", "/api/bills/month/**").permitAll()
-                .requestMatchers("/api/bills/week-summary", "/api/bills/week-summary/**").permitAll()
-                .requestMatchers("/api/bills/year-summary", "/api/bills/year-summary/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/login").permitAll()
+                // 只放通登录接口和API文档接口
+                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // 其他所有接口都需要认证
                 .anyRequest().authenticated()
             )
             .httpBasic(withDefaults())
@@ -53,7 +51,8 @@ public class SecurityConfig{
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
                     response.setContentType("application/json;charset=UTF-8");
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"code\":\"failed\",\"message\":\"Unauthorized\"}");
                 })
             )
             // 配置认证提供者
