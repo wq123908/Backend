@@ -4,6 +4,9 @@ import com.ssauuuuuu.backend.dto.BillDTO;
 import com.ssauuuuuu.backend.model.Bill;
 import com.ssauuuuuu.backend.repository.BillRepository;
 import com.ssauuuuuu.backend.service.BillService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -14,15 +17,33 @@ import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Service
 public class BillServiceImpl implements BillService {
+    private static final Logger logger = LoggerFactory.getLogger(BillServiceImpl.class);
+
     private final BillRepository billRepository;
 
     public BillServiceImpl(BillRepository billRepository) {
         this.billRepository = billRepository;
     }
 
-    public void saveBills(List<Bill> bills) { billRepository.saveAll(bills);}
+    public void saveBills(List<Bill> bills) {
+        try {
+            billRepository.saveAll(bills);
+        } catch (DataIntegrityViolationException e) {
+            // 处理重复插入异常，可以选择忽略或单独处理每条记录
+            bills.forEach(bill -> {
+                try {
+                    billRepository.save(bill);
+                } catch (DataIntegrityViolationException ex) {
+                    // 忽略单条重复记录的插入错误
+                    logger.debug("Duplicate bill ignored: {}", bill.getThirdPartyOrderNo());
+                }
+            });
+        }
+    }
+
 
    @Override
     public List<BillDTO> getBillByMonth(LocalDateTime month, Integer userId) {

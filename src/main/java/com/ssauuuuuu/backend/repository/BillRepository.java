@@ -10,5 +10,5 @@ import java.util.List;
 public interface BillRepository extends JpaRepository<Bill, Long> {
 
     List<Bill> findByUserIdAndTransactionTimeBetween(Integer userId, LocalDateTime startDate, LocalDateTime endDate);
-
+    List<String> findThirdPartyOrderNosByThirdPartyOrderNoIn(List<String> thirdPartyOrderNos);
 }

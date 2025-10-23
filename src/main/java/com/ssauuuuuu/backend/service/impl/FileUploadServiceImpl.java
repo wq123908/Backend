@@ -48,7 +48,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         try {
             // 保存文件
-            file.transferTo(filePath);
+            //file.transferTo(filePath);
 
             // 解析文件
             List<AlipayBillDTO> result = FileParserFactory.getParser("alipay")
